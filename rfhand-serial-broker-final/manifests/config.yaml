@@ -1,0 +1,4 @@
+dev:
+  port: COM4
+  baudrate: 921600
+  timeout: 1

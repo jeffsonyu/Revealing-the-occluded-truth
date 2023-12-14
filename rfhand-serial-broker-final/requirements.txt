@@ -1,0 +1,10 @@
+numpy==1.23
+pyyaml==6.0
+pyserial==3.5
+easydict==1.10
+seaborn
+opencv-python
+matplotlib
+tqdm
+pyrfuniverse==0.8.2.1
+plyer
