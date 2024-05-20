@@ -1,0 +1,113 @@
+hydra:
+  run:
+    dir: ./outputs/tracking_corr/${datamodule.obj_class}
+
+datamodule_name: VTacODataModule
+datamodule:
+  root_dir: /mnt/public/datasets/zhenjun/VTacO_Track/v00
+  obj_class: "001"
+  tracking: True  
+  train_all: False   
+  sample_point_num: 2048  
+  sample_pc_num: 1024  
+  pc_noise: 0.005
+  batch_size: 8
+  num_workers: 4
+
+trackingmodule_name: WNFTrackingCorrPipeline
+trackingmodule:
+  training_param:
+    optimizer: "Adam"
+    lr: 0.0001
+    
+  # pointnet_param:
+  #   nn_channels: [3, 16, 32, 48]
+  #   feature_transform: False
+
+  # Corr_param:
+  #   num_sample: 512
+  #   mlp_1: [128, 128, 64, 32]
+  #   mlp_2: [32, 16, 3]
+  #   mlp_pointnet: [3, 16, 32]
+  
+  pointnet_param:
+    nn_channels: [3, 32, 64, 96]
+    feature_transform: False
+
+  Corr_param:
+    num_sample: 512
+    mlp_1: [256, 128, 64, 32]
+    mlp_2: [32, 16, 3]
+    # mlp_pointnet: [3, 16, 32]
+    pointnet_param:
+      nn_channels: [3, 8, 16, 24]
+      feature_transform: False
+
+  unet3d_param:
+    num_levels: 4
+    f_maps: 32
+    in_channels: 32
+    out_channels: 32
+  
+  grid_param:
+    reso_grid: 64
+    grid_dim: 32
+    padding: 0.1
+    sample_mode: bilinear
+  
+  decoder_param:
+    input_dim: 3
+    hidden_size: 32
+    n_blocks: 5
+  
+  vis_param:
+    vis_every: 20
+    nx: 64
+    vis_point_every_split: 100000
+    print_time: True
+    vis_flow: True
+
+  loss_items: {"sdf": 1, "hand": 1}
+  
+  hand_decoder_param:
+    # pointnet_param:
+    #   nn_channels: [3, 64, 128, 256]
+    # mlp_param:
+    #   nn_channels: [256, 128, 51]
+
+    pointnet_param:
+      nn_channels: [3, 64, 128, 256]
+      feature_transform: False
+    transformer_param:
+      use_xyz: True
+      input_size: 4000
+      d_model: 320
+      num_layers: 1
+      key_feature_dim: 128
+      with_pos_embed: True
+      encoder_pos_embed_input_dim: 3
+      decoder_pos_embed_input_dim: 3
+      fea_channels: [320, 256, 128]
+      feat_slim_last_layer: True
+    mlp_param:
+      nn_channels: [128, 64, 51]
+    manolayer_param: 
+      center_idx: 0
+      flat_hand_mean: True
+      ncomps: 45
+      side: right
+      mano_root: /mnt/homes/zhenjun/vtaco_v2/components/manopth/mano/models
+      use_pca: False
+      root_rot_mode: axisang
+      joint_rot_mode: axisang
+      robust_rot: False
+      return_transf: True
+      return_full_pose: True
+
+
+trainer:
+  gpus: [0]
+  check_val_every_n_epoch: 5
+  # max_epochs: 100
+  max_steps: 30000
+  resume_from_checkpoint: ./checkpoints/last.ckpt
