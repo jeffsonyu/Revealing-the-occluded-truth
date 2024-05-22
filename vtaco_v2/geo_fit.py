@@ -47,7 +47,8 @@ def main(cfg: DictConfig):
 
     pipeline_model = eval(cfg_module['trackingmodule_name'])(**cfg_module.trackingmodule).to(device)
         
-    # pipeline_model.load_model_only(cfg.trainer.resume_from_checkpoint)
+    pipeline_model.load_model_only(cfg.trainer.resume_from_checkpoint)
+    pipeline_model.eval()
     
     all_config = {
         'config': OmegaConf.to_container(cfg, resolve=True),
@@ -69,6 +70,8 @@ def main(cfg: DictConfig):
             
             o3d.io.write_triangle_mesh(f"./vis/{name[i]}.obj", obj_mesh_o3d)
             o3d.io.write_triangle_mesh(f"./vis/{name[i]}_hand.obj", hand_mesh_o3d)
+            break
+        break
         
 
 # %%

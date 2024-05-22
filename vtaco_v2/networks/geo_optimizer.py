@@ -178,6 +178,17 @@ class GeOptimizer():
         point_force_region = {}
         for r_name_i, r_idx_i in zip(self.region_name, self.region_idx):
             point_force_region[r_name_i] = sensor_forces[:, torch.tensor(r_idx_i)[:, 0], torch.tensor(r_idx_i)[:, 1]]
+            
+        for r_name_i, r_idx_i in zip(self.region_name, self.region_idx):
+            force_region = sensor_forces[:, torch.tensor(r_idx_i)[:, 0], torch.tensor(r_idx_i)[:, 1]]
+            if force_region.size(1) > 12:
+                force_region = force_region[:, torch.randperm(force_region.size(1))[:12]]
+            point_force_region[r_name_i] = force_region
+            
+        print(sensor_positions.size(), len(self.region_name))
+        for key, value in point_force_region.items():
+            print(key, value.size())
+            
 
         ### K attractive string, probably computed primitively or with MLP
         if self.sensor_sample_mode == "anchor":

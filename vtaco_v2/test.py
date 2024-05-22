@@ -111,8 +111,9 @@ if __name__ == "__main__":
     # pc_1_feat, pc_1_feat_global, *_ = pointnet(pc_1.permute(0, 2, 1))
     # ic(pc_1_feat.size(), pc_1_feat_global.size())
     
-    dataset = VTacOTrackingForceDataset(**cfg['datamodule'])
-    print(dataset.__len__())
+    dataset = VTacODataModule(**cfg['datamodule'])
+    dataset.setup()
+    ic(dataset.dataset_train.__getitem__(0)['pc'].shape, dataset.dataset_train.__getitem__(0)['force'].shape, dataset.dataset_train.__getitem__(0)['mano'].shape)
     
     # module_name = "WNFTrackingCorrPipeline"
     # model = eval(cfg['trackingmodule_name'])(**cfg['trackingmodule']).to(device)

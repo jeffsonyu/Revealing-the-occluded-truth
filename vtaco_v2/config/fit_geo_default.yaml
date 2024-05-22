@@ -11,7 +11,7 @@ datamodule:
   sample_pc_num: 512  
   pc_noise: 0.005
   batch_size: 6
-  num_workers: 32
+  num_workers: 4
 
 trackingmodule_path: /mnt/homes/zhenjun/vtaco_v2/config/train_tracking_corr_flow.yaml
 

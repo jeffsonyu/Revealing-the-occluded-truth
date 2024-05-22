@@ -46,7 +46,7 @@ class VisCallBack(pl.Callback):
                 
                 o3d.io.write_triangle_mesh(os.path.join(trainer.logger.save_dir, "vis", mesh_obj_name.replace(".obj", "_hand.obj")), mesh_hand_o3d)
                 
-            if pl_module.vis_flow is not None:
+            if hasattr(pl_module, "vis_flow"):
                 feat_flow = pl_module.vis_corr_flow(batch, batch_idx)
                 ply_path = os.path.join(trainer.logger.save_dir, "vis", mesh_obj_name.replace(".obj", "_flow.ply"))
                 write_ply(ply_path, feat_flow[0].transpose(0, 1).cpu().numpy())

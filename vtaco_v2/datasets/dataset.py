@@ -175,16 +175,16 @@ class VTacOTrackingDataset(Dataset):
                     if frame_name.endswith("001"):
                         pc_former = pointcloud['points']
                     else:
-                        pc_latter = pointcloud['points']
+                        pc_now = pointcloud['points']
                         self.name_list.append(datapoint_name + "_" + frame_name)
-                        self.pc_list.append([pc_former, pc_latter])
+                        self.pc_list.append([pc_former, pc_now])
                         self.pc_for_norm_list.append(pointcloud['pc_ply'])
                         self.sample_points_list.append(points['points'])
                         self.occ_list.append(points['occupancies'])
                         self.mano_list.append(points['mano'].reshape(-1))
                         self.points_obj_gt_list.append(points['points_obj'])
                         self.point_force.append(pointcloud['force'])
-                        pc_former = pc_latter
+                        pc_former = pc_now
                 else:
                     self.name_list.append(datapoint_name + "_" + frame_name)
                     self.pc_list.append(pointcloud['points'])
@@ -284,7 +284,6 @@ class VTacOTrackingForceDataset(Dataset):
             for frame_name in os.listdir(seq_depth_dir):
                 frame_dir = os.path.join(seq_depth_dir, frame_name)
                 points = np.load(os.path.join(frame_dir, "points.npz"), allow_pickle=True)
-            
                 pointcloud = np.load(os.path.join(frame_dir, "pointcloud.npz"), allow_pickle=True)
                 
                 points = self.transform_point(dict(points))
@@ -292,25 +291,42 @@ class VTacOTrackingForceDataset(Dataset):
                 if self.tracking:
                     if frame_name.endswith("001"):
                         pc_former = pointcloud['points']
-                        force_former = pointcloud['force']
                         mano_former = points['mano'].reshape(-1)
+                        force_former = pointcloud['force']
+                    
+                    elif "Frame{:03d}".format(int(frame_name[-3:])+1) not in os.listdir(seq_depth_dir):
+                        continue
+                    
                     else:
-                        pc_latter = pointcloud['points']
-                        force_latter = pointcloud['force']
-                        mano_latter = pointcloud['mano'].reshape(-1)
+                        ### Next Frame data
+                        next_frame = "Frame{:03d}".format(int(frame_name[-3:])+1)
+                        next_frame_dir = os.path.join(seq_depth_dir, next_frame)
+                        points_next = np.load(os.path.join(next_frame_dir, "points.npz"), allow_pickle=True)
+                        pointcloud_next = np.load(os.path.join(next_frame_dir, "pointcloud.npz"), allow_pickle=True)
+                        points_next = self.transform_point(dict(points_next))
+                        pointcloud_next = self.transform_pc(dict(pointcloud_next))
+                        
+                        pc_next = pointcloud_next['points']
+                        force_next = pointcloud_next['force']
+                        mano_next = points_next['mano'].reshape(-1)
+                        
+                        ### This frame data
+                        pc_now = pointcloud['points']
+                        force_now = pointcloud['force']
+                        mano_now = points['mano'].reshape(-1)
                         
                         self.name_list.append(datapoint_name + "_" + frame_name)
-                        self.pc_list.append([pc_former, pc_latter])
+                        self.pc_list.append(np.array([pc_former, pc_now, pc_next]))
                         self.pc_for_norm_list.append(pointcloud['pc_ply'])
                         self.sample_points_list.append(points['points'])
                         self.occ_list.append(points['occupancies'])
-                        self.mano_list.append([mano_former, mano_latter])
+                        self.mano_list.append(np.array([mano_former, mano_now, mano_next]))
                         self.points_obj_gt_list.append(points['points_obj'])
-                        self.point_force.append([force_former, force_latter])
+                        self.point_force.append(np.array([force_former, force_now, force_next]))
                         
-                        pc_former = pc_latter
-                        force_former = force_latter
-                        mano_former = mano_latter
+                        pc_former = pc_now
+                        force_former = force_now
+                        mano_former = mano_now
                 else:
                     self.name_list.append(datapoint_name + "_" + frame_name)
                     self.pc_list.append(pointcloud['points'])
@@ -330,8 +346,7 @@ class VTacOTrackingForceDataset(Dataset):
 
         if self.tracking:
             item_dict['name'] = self.name_list[index]
-            item_dict['pc_1'] = self.pc_list[index][0]
-            item_dict['pc_2'] = self.pc_list[index][1]
+            item_dict['pc'] = self.pc_list[index]
             item_dict['sample_points'] = self.sample_points_list[index]
             item_dict['occ'] = self.occ_list[index]
             item_dict['mano'] = self.mano_list[index]
@@ -371,7 +386,8 @@ class VTacODataModule(pl.LightningDataModule):
         self.sample_pc_num = sample_pc_num
         self.pc_noise = pc_noise
         
-        self.dataset = VTacOTrackingForceDataset if "Track" in self.root_dir else VTacODataset
+        # self.dataset = VTacOTrackingDataset if "Track" in self.root_dir else VTacODataset
+        self.dataset = VTacOTrackingForceDataset
 
     # When doing distributed training, Datamodules have two optional arguments for
     # granular control over download/prepare/splitting data:
