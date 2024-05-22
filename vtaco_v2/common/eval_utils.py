@@ -23,12 +23,12 @@ def compute_iou(occ1, occ2, threshold=0.5):
         occ2 = occ2.reshape(occ2.shape[0], -1)
 
     # Convert to boolean values
-    occ1 = (occ1 >= threshold)
-    occ2 = (occ2 >= threshold)
-    
-    # threshold = np.mean(occ2)
     # occ1 = (occ1 >= threshold)
     # occ2 = (occ2 >= threshold)
+    
+    threshold = np.mean(occ2)
+    occ1 = (occ1 >= threshold)
+    occ2 = (occ2 >= threshold)
 
     # Compute IOU
     area_union = (occ1 | occ2).astype(np.float32).sum(axis=-1)

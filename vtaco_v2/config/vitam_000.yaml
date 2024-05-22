@@ -4,8 +4,8 @@ hydra:
 
 datamodule_name: VTacODataModule
 datamodule:
-  root_dir: /mnt/public/datasets/zhenjun/VTacO_Track/v00
-  obj_class: "001"
+  root_dir: /mnt/public/datasets/zhenjun/vitam_glove_data/v00
+  obj_class: "000"
   tracking: True  
   train_all: False   
   sample_point_num: 2048  
@@ -103,6 +103,6 @@ trackingmodule:
 trainer:
   gpus: [1]
   check_val_every_n_epoch: 5
-  # max_epochs: 100
-  max_steps: 30000
-  resume_from_checkpoint: ./checkpoints/epoch=18-iou=0.8305.ckpt
+  max_epochs: 100
+  # max_steps: 30000
+  resume_from_checkpoint: ./checkpoints/last.ckpt

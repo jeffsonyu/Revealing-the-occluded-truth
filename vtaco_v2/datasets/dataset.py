@@ -267,19 +267,19 @@ class VTacOTrackingForceDataset(Dataset):
         
         with open(os.path.join(obj_class_dir, f"{self.dataset_split}.lst"), "r") as f:
             self.datapoint_list = [line.strip() for line in f.readlines()]
-            seq_depth_dir_list = []
-            for datapoint in self.datapoint_list:
-                datapoint_dir = obj_class_dir
-                for data_dir in datapoint.split("_"):
-                    datapoint_dir = os.path.join(datapoint_dir, data_dir)
-                seq_depth_dir_list.append(datapoint_dir)
+            # seq_depth_dir_list = []
+            # for datapoint in self.datapoint_list:
+            #     datapoint_dir = obj_class_dir
+            #     for data_dir in datapoint.split("-"):
+            #         datapoint_dir = os.path.join(datapoint_dir, data_dir)
+            #     seq_depth_dir_list.append(datapoint_dir)
         
         # for seq_depth_dir in seq_depth_dir_list:
         for datapoint_name in self.datapoint_list:
             seq_depth_dir = obj_class_dir
-            for data_dir in datapoint_name.split("_"):
+            for data_dir in datapoint_name.split("-"):
                 seq_depth_dir = os.path.join(seq_depth_dir, data_dir)
-                
+            
             if not os.path.exists(seq_depth_dir): continue
             for frame_name in os.listdir(seq_depth_dir):
                 frame_dir = os.path.join(seq_depth_dir, frame_name)
