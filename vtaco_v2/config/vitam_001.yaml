@@ -1,11 +1,11 @@
 hydra:
   run:
-    dir: ./outputs/vtacotracking/${datamodule.obj_class}
+    dir: ./outputs/vtacotracking/003
 
 datamodule_name: VTacODataModule
 datamodule:
   root_dir: /mnt/public/datasets/zhenjun/vitam_glove_data/v00
-  obj_class: "000"
+  obj_class: "001"
   tracking: True  
   train_all: False   
   sample_point_num: 2048  
@@ -101,7 +101,7 @@ trackingmodule:
 
 
 trainer:
-  gpus: [3]
+  gpus: [0]
   check_val_every_n_epoch: 1
   max_epochs: 101
   # max_steps: 30000

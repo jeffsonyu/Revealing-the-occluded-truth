@@ -1,11 +1,11 @@
 hydra:
   run:
-    dir: ./outputs/vtacotracking/${datamodule.obj_class}
+    dir: ./outputs/vtacotracking_touch/${datamodule.obj_class}
 
 datamodule_name: VTacODataModule
 datamodule:
-  root_dir: /mnt/public/datasets/zhenjun/VTacO
-  obj_class: "001"
+  root_dir: /mnt/public/datasets/zhenjun/vitam_glove_data/v01
+  obj_class: "002"
   tracking: True  
   train_all: False   
   sample_point_num: 2048  
@@ -14,26 +14,45 @@ datamodule:
   batch_size: 8
   num_workers: 4
 
-trackingmodule_name: WNFTrackingPipeline
+trackingmodule_name: ForceTrackingPipeline
 trackingmodule:
+  anchor_param:
+    assets_dir: /mnt/homes/zhenjun/vtaco_v2/assets
+    sensor_sample_mode: anchor
+
   training_param:
     optimizer: "Adam"
     lr: 0.0001
     
   pointnet_param:
-    nn_channels: [3, 64, 128, 256]
+    nn_channels: [3, 16, 32, 48]
     feature_transform: False
+  
+  mlp_force_param:
+    nn_channels: [12, 32, 64]
 
-  transformer_param:
+  transformer_force_param:
     use_xyz: True
     input_size: 4000
-    d_model: 320
+    d_model: 64
     num_layers: 1
-    key_feature_dim: 128
+    key_feature_dim: 64
     with_pos_embed: True
     encoder_pos_embed_input_dim: 3
     decoder_pos_embed_input_dim: 3
-    fea_channels: [320, 128, 32]
+    fea_channels: [64, 64, 32]
+    feat_slim_last_layer: True
+  
+  transformer_param:
+    use_xyz: True
+    input_size: 4000
+    d_model: 32
+    num_layers: 1
+    key_feature_dim: 32
+    with_pos_embed: True
+    encoder_pos_embed_input_dim: 3
+    decoder_pos_embed_input_dim: 3
+    fea_channels: [32, 32, 32]
     feat_slim_last_layer: True
 
   unet3d_param:
@@ -54,8 +73,8 @@ trackingmodule:
     n_blocks: 5
   
   vis_param:
-    vis_every: 20
-    nx: 64
+    vis_every: 1
+    nx: 128
     vis_point_every_split: 100000
     print_time: True
 
@@ -82,8 +101,8 @@ trackingmodule:
 
 
 trainer:
-  gpus: [1]
-  check_val_every_n_epoch: 5
-  # max_epochs: 100
-  max_steps: 30000
-  resume_from_checkpoint: ./checkpoints/epoch=19-iou=0.9143.ckpt
+  gpus: [7]
+  check_val_every_n_epoch: 1
+  max_epochs: 102
+  # max_steps: 30000
+  resume_from_checkpoint: ./checkpoints/last.ckpt

@@ -8,3 +8,8 @@ networks/tracking_networks.py
 .vscode/
 train_corr.py
 train_transformer.py
+test.py
+test_geo.py
+generate_sensor_param.py
+config/train_*
+config/fit_geo_default.yaml

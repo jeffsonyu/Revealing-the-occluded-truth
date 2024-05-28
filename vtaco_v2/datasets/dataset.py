@@ -281,7 +281,7 @@ class VTacOTrackingForceDataset(Dataset):
                 seq_depth_dir = os.path.join(seq_depth_dir, data_dir)
             
             if not os.path.exists(seq_depth_dir): continue
-            for frame_name in os.listdir(seq_depth_dir):
+            for frame_name in sorted(os.listdir(seq_depth_dir)):
                 frame_dir = os.path.join(seq_depth_dir, frame_name)
                 points = np.load(os.path.join(frame_dir, "points.npz"), allow_pickle=True)
                 pointcloud = np.load(os.path.join(frame_dir, "pointcloud.npz"), allow_pickle=True)
