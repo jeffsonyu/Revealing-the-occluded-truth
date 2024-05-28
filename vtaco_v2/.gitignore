@@ -13,3 +13,4 @@ test_geo.py
 generate_sensor_param.py
 config/train_*
 config/fit_geo_default.yaml
+networks/geo_optimizer.py
