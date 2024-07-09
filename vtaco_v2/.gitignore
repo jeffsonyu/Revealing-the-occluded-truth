@@ -6,9 +6,11 @@ data/
 outputs/
 demo_logs/
 networks/tracking_pipeline_old.py
+networks/tracking_pipeline.py
 networks/tracking_networks.py
 networks/geo_optimizer.py
 
+./datasets/dataset_origin.py
 
 geo_fit.py
 train_corr.py
@@ -19,3 +21,4 @@ generate_sensor_param.py
 
 config/train_*
 config/fit_geo_default.yaml
+config/vitam_*

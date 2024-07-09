@@ -2,7 +2,7 @@ hydra:
   run:
     dir: ./outputs/vtacotracking_touch/${datamodule.obj_class}
 
-datamodule_name: VTacODataModule
+datamodule_name: ViTaMDataModule
 datamodule:
   root_dir: /mnt/public/datasets/zhenjun/vitam_glove_data/v01
   obj_class: "000"

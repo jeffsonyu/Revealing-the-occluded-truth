@@ -1,23 +1,23 @@
 hydra:
   run:
-    dir: ./outputs/vtacotracking/${datamodule.obj_class}
+    dir: ./outputs/test/${datamodule.obj_class}
 
 datamodule_name: ViTaMDataModule
 datamodule:
-  root_dir: /mnt/public/datasets/zhenjun/vitam_glove_data/v00
-  obj_class: "002"
+  root_dir: ../../../data
+  obj_class: "000"
   tracking: True  
   train_all: False   
   sample_point_num: 2048  
   sample_pc_num: 2048  
   pc_noise: 0.005
-  batch_size: 8
+  batch_size: 4
   num_workers: 4
 
 trackingmodule_name: ForceTrackingPipeline
 trackingmodule:
   anchor_param:
-    assets_dir: /mnt/homes/zhenjun/vtaco_v2/assets
+    assets_dir: ../../../assets
     sensor_sample_mode: anchor
 
   training_param:
@@ -73,7 +73,7 @@ trackingmodule:
     n_blocks: 5
   
   vis_param:
-    vis_every: 1
+    vis_every: 100
     nx: 128
     vis_point_every_split: 100000
     print_time: True
@@ -91,7 +91,7 @@ trackingmodule:
       flat_hand_mean: True
       ncomps: 45
       side: right
-      mano_root: /mnt/homes/zhenjun/vtaco_v2/components/manopth/mano/models
+      mano_root: ../../../components/manopth/mano/models
       use_pca: False
       root_rot_mode: axisang
       joint_rot_mode: axisang
@@ -101,8 +101,8 @@ trackingmodule:
 
 
 trainer:
-  gpus: [2]
-  check_val_every_n_epoch: 1
-  max_epochs: 101
+  gpus: [3]
+  check_val_every_n_epoch: 20
+  max_epochs: 200
   # max_steps: 30000
-  resume_from_checkpoint: ./checkpoints/last.ckpt
+  resume_from_checkpoint: ../../../checkpoints/last.ckpt

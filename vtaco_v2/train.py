@@ -10,10 +10,9 @@ import hydra
 from omegaconf import DictConfig, OmegaConf
 import pytorch_lightning as pl
 
-from networks.tracking_pipeline import WNFTrackingCorrPipeline, WNFTrackingPipeline, WNFTrackingCorrFlowPipeline
 from networks.tracking_pipeline_force import ForceTrackingPipeline
 from networks.callbacks import VisCallBack
-from datasets.dataset import VTacODataModule
+from datasets.dataset import ViTaMDataModule
 
 
 @hydra.main(config_path="config", config_name="vitam_000")
