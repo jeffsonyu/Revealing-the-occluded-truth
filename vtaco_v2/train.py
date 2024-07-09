@@ -15,7 +15,7 @@ from networks.callbacks import VisCallBack
 from datasets.dataset import ViTaMDataModule
 
 
-@hydra.main(config_path="config", config_name="vitam_000")
+@hydra.main(config_path="config", config_name="test")
 def main(cfg: DictConfig):
     # hydra creates working directory automatically
     print("Workding under: ", os.getcwd())
