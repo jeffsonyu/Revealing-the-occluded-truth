@@ -220,16 +220,22 @@ class ForceTrackingPipeline(pl.LightningModule):
         ### Pointnet encode feature from two pc
         pc_1_feat, pc_1_feat_global, *_ = self.pc_feature_encoder(pc_1.permute(0, 2, 1))
         pc_2_feat, pc_2_feat_global, *_ = self.pc_feature_encoder(pc_2.permute(0, 2, 1))
+        pc_3_feat, pc_3_feat_global, *_ = self.pc_feature_encoder(pc_3.permute(0, 2, 1))
+        
         ### Force MLP encode force features
         force_1_feat = self.force_mlp(force_1).permute(0, 2, 1)
         force_2_feat = self.force_mlp(force_2).permute(0, 2, 1)
+        force_3_feat = self.force_mlp(force_3).permute(0, 2, 1)
         
         ### Transformer Fusion for force and pc feat
         force_feat_fused_1 = self.force_fuser(pc_1_feat, pc_1, force_1_feat, anchors_1).permute(0, 2, 1)
         force_feat_fused_2 = self.force_fuser(pc_2_feat, pc_2, force_2_feat, anchors_2).permute(0, 2, 1)
+        force_feat_fused_3 = self.force_fuser(pc_3_feat, pc_3, force_3_feat, anchors_3).permute(0, 2, 1)
         
-        ### Transformer Fusion feature from two frames
-        pc_feat_fused = self.transformerfuser(force_feat_fused_2, pc_2, force_feat_fused_1, pc_1)
+        ### Transformer Fusion feature from Three frames
+        pc_feat_fused_former = self.transformerfuser(force_feat_fused_2, pc_2, force_feat_fused_1, pc_1).permute(0, 2, 1)
+        
+        pc_feat_fused = self.transformerfuser(force_feat_fused_3, pc_3, pc_feat_fused_former, pc_2)
         
         ### Generate grid features from pc_2 and fused_feat
         pc_feat_fused_grid = self.generate_grid_features(pc_2, pc_feat_fused)
