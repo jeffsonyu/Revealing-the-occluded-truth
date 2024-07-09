@@ -101,7 +101,7 @@ class ViTaMTrackingForceDataset(Dataset):
                         self.occ_list.append(points['occupancies'])
                         self.mano_list.append(np.array([mano_former, mano_now, mano_next]))
                         self.points_obj_gt_list.append(points['points_obj'])
-                        self.point_force.append(np.array([force_former, force_now, force_next]))
+                        self.point_force.append(np.array([force_former, force_now, force_next]) * 100)
                         
                         pc_former = pc_now
                         force_former = force_now
