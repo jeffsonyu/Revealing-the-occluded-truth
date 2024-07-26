@@ -40,4 +40,4 @@ To train on this small data sample, simply use the following command
 python train.py --config-name test
 ```
 
-It will create a directory `output` which will generate the output of the training process, including tensorboard log files, visualization results, etc.
+It will create a directory `outputs/test` which will generate the output of the training process, including tensorboard log files, visualization results, etc.
