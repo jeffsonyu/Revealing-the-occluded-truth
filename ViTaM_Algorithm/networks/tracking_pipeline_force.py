@@ -8,9 +8,9 @@ from torch import nn
 import torch.nn.functional as F
 import pytorch_lightning as pl
 
-from networks.minipointnet import MiniPointNetfeat
 from networks.pointnet import PointNetfeat
 from networks.transformer import TransformerFusion
+from networks.multihead_attention import RelationUnit
 from components.unet3d import UNet3D
 from networks.decoder import WNFdecoder
 from networks.hand_estimator import HandTracker, HandTracker_v2, MLPDecoder
@@ -34,6 +34,7 @@ class ForceTrackingPipeline(pl.LightningModule):
                  training_param,
                  pointnet_param,
                  mlp_force_param,
+                 attn_force_param,
                  transformer_force_param,
                  transformer_param,
                  grid_param,
@@ -55,6 +56,9 @@ class ForceTrackingPipeline(pl.LightningModule):
         
         ### Force MLP
         self.force_mlp = MLPDecoder(**mlp_force_param)
+        
+        ### Self Attention for force
+        self.force_attn = RelationUnit(**attn_force_param)
         
         ### Transformer Force Fusion
         self.force_fuser = TransformerFusion(**transformer_force_param)
@@ -219,14 +223,20 @@ class ForceTrackingPipeline(pl.LightningModule):
         pc_3_feat, pc_3_feat_global, *_ = self.pc_feature_encoder(pc_3.permute(0, 2, 1))
         
         ### Force MLP encode force features
-        force_1_feat = self.force_mlp(force_1).permute(0, 2, 1)
-        force_2_feat = self.force_mlp(force_2).permute(0, 2, 1)
-        force_3_feat = self.force_mlp(force_3).permute(0, 2, 1)
+        force_1_feat = self.force_mlp(force_1)
+        force_2_feat = self.force_mlp(force_2)
+        force_3_feat = self.force_mlp(force_3)
         
+        ### Attention for force
+        force_1_feat_attn = self.force_attn(force_1_feat, force_1_feat, force_1_feat).permute(0, 2, 1)
+        force_2_feat_attn = self.force_attn(force_2_feat, force_2_feat, force_2_feat).permute(0, 2, 1)
+        force_3_feat_attn = self.force_attn(force_3_feat, force_3_feat, force_3_feat).permute(0, 2, 1)
+        
+
         ### Transformer Fusion for force and pc feat
-        force_feat_fused_1 = self.force_fuser(pc_1_feat, pc_1, force_1_feat, anchors_1).permute(0, 2, 1)
-        force_feat_fused_2 = self.force_fuser(pc_2_feat, pc_2, force_2_feat, anchors_2).permute(0, 2, 1)
-        force_feat_fused_3 = self.force_fuser(pc_3_feat, pc_3, force_3_feat, anchors_3).permute(0, 2, 1)
+        force_feat_fused_1 = self.force_fuser(pc_1_feat, pc_1, force_1_feat_attn, anchors_1).permute(0, 2, 1)
+        force_feat_fused_2 = self.force_fuser(pc_2_feat, pc_2, force_2_feat_attn, anchors_2).permute(0, 2, 1)
+        force_feat_fused_3 = self.force_fuser(pc_3_feat, pc_3, force_3_feat_attn, anchors_3).permute(0, 2, 1)
         
         ### Transformer Fusion feature from Three frames
         pc_feat_fused_former = self.transformerfuser(force_feat_fused_2, pc_2, force_feat_fused_1, pc_1).permute(0, 2, 1)

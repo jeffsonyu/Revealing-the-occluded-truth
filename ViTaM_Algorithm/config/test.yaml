@@ -30,6 +30,11 @@ trackingmodule:
   
   mlp_force_param:
     nn_channels: [12, 32, 64]
+    
+  attn_force_param:
+    feature_dim: 64
+    key_feature_dim: 64
+
 
   transformer_force_param:
     use_xyz: True

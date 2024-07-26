@@ -111,3 +111,9 @@ class RelationUnit(nn.Module):
 
         return F.relu(output)
 
+if __name__ == '__main__':
+    # Test
+    query = torch.randn(32, 22, 64)
+    multihead_attention = RelationUnit(feature_dim=64, key_feature_dim=64)
+    output = multihead_attention(query, query, query)
+    print(output.shape)
